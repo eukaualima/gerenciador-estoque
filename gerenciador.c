@@ -49,7 +49,7 @@ FILE *criarArquivo(char filename[])
 	FILE *arq;
 	
 	// < Abre (ou cria) o arquivo >	
-	arq = fopen(filename, "a");
+	arq = fopen(filename, "ab");
 	
 	// < Retorna o arquivo aberto >
 	return arq;
@@ -74,51 +74,49 @@ unsigned char *addSigla(unsigned char *sigla)
 void inserirProdutos()
 {
 	// < Declaração de variáveis locais >
-	int i, cancelar, produtos;
+	int cancelar, produtos;
 	unsigned char sigla[4];
-	T_PRODUTO produto[10];
+	T_PRODUTO produto;
 	
 	// < Cria ou inicia o arquivo >
-	FILE *arq = criarArquivo("produtos.txt");
+	FILE *arq = criarArquivo("produtos.dat");
 	
 	// < Entrada de dados >
-	i = 0;
 	produtos = 0;
 	
 	do
 	{
-		printf("\n>--------<[ Informações do produto %i/10 ]>--------<\n", i+1);
+		printf("\n>--------<[ Informações do produto ]>--------<\n");
 		
 		printf("Nome: ");
-		scanf("%s", produto[i].nome);
+		scanf("%s", produto.nome);
 		
 		printf("Valor: R$");
-		scanf("%f", &produto[i].valor);
+		scanf("%f", &produto.valor);
 		
 		printf("Quantidade (pode mudar depois!): ");
-		scanf("%i", &produto[i].quantidade);
+		scanf("%i", &produto.quantidade);
 		
 		printf("ID numérico: ");
-		scanf("%s", produto[i].id);
+		scanf("%s", produto.id);
 		
-		strcpy(sigla, produto[i].nome);
+		strcpy(sigla, produto.nome);
 		
 		// < Gera a sigla do produto >
 		addSigla(sigla);
 		
 		// < Concatena o ID numérico com a sigla >
-		strcat(produto[i].id, sigla);
+		strcat(produto.id, sigla);
 		
-		printf("[!] Sucesso! O produto \"%s\" foi criado com ID %s\n", produto[i].nome, produto[i].id);
+		printf("[!] Sucesso! O produto \"%s\" foi criado com ID %s\n", produto.nome, produto.id);
 		
 		// < Escreve no arquivo >
-		fprintf(arq, "\nProduto %s\nNome: %s\nValor: R$%.2f\nQuantidade: %i\n", produto[i].id, produto[i].nome, produto[i].valor, produto[i].quantidade);
+		fwrite(&produto, sizeof(T_PRODUTO), 1, arq);
 		
 		printf("[!] Adicionar mais produtos? Digite 1 para NÃO ou 0 par SIM: ");
 		scanf("%i", &cancelar);
 		
-		i++;
-	} while (cancelar != 1 && i < 10);
+	} while (cancelar != 1);
 	
 	// < Fecha o arquivo >
 	fclose(arq);
@@ -130,9 +128,10 @@ void mostrarProdutos()
 	// < Declaração de variáveis locais>
 	unsigned char linha[20];
 	
-	FILE *arq = fopen("produtos.txt", "r");
+	FILE *arq = fopen("produtos.dat", "rb");
 	
 	printf("\n>-----------------<[ P R O D U T O S ]>-----------------<\n");
+	
 	while(fgets(linha, 20, arq) != NULL)
 	{
 		printf("%s", linha);
@@ -168,6 +167,7 @@ void menu()
 			
 			default:
 				printf("\n\n[!] Escolha uma opção válida.\n\n");
+				
 				menu();
 			break;
 		}
@@ -186,4 +186,3 @@ int main (void)
 	// < Inicia o menu principal >
 	menu();
 }
-
