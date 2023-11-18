@@ -102,7 +102,7 @@ char *addSigla(char *sigla)
 }
 
 // < Procedimento para inserção de produtos na lista >
-void inserirProdutos(T_PRODUTO p)
+T_PRODUTO inserirProdutos(T_PRODUTO p)
 {
 	// < Declaração de variáveis locais >
 	int cancelar, quantidade;
@@ -150,16 +150,34 @@ void inserirProdutos(T_PRODUTO p)
 		scanf("%i", &cancelar);
 		
 	} while (cancelar != 1);
+
+	return p;
 }
 
 // < Procedimento para mostrar os produtos registrados >
-void mostrarProdutos()
+void mostrarProdutos(T_PRODUTO p)
 {
-	// < Declaração de variáveis locais>
-	char linha[20];
-	
-	printf("\n>-----------------<[ P R O D U T O S ]>-----------------<\n");
-	system("pause");
+	// < Declaração de variáveis locais >
+	int i = 0;
+
+	if (p == NULL)
+	{
+		printf("| ! | Lista vazia.\n");
+	}
+	else
+	{
+		printf("<---------------------<[ P R O D U T O S ]--------------------->\n");
+
+		while (p != NULL)
+		{
+			i++;
+			// < Imprime o produto >
+			printf("<-<| %i |>->\tID: %s\tNome: %s\tValor: R$ %.2f\tQtd.: %i\n\n", i, p->id, p->nome, p->valor, p->quantidade);
+			
+			// < Anda na lista >
+			p = p->prox;
+		}
+	}
 }
 
 // < Procedimento para o menu principal do programa >
@@ -180,11 +198,11 @@ void menu()
 		switch(opcao)
 		{
 			case 1:
-				inserirProdutos(p);
+				p = inserirProdutos(p);
 			break;
 			
 			case 2:
-				mostrarProdutos();
+				mostrarProdutos(p);
 			break;
 			
 			case 3:
