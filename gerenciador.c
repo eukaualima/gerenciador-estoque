@@ -21,65 +21,93 @@
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
+#include <ctype.h>
 
 /*
 =----------------=
 =-> Estruturas <-=
 =----------------=
 */
-// < Struct para os produtos >
+// < Struct para os nós do estoque >
 struct _PRODUTO_ 
 {
 	int quantidade;
-	float valor;
+	float valor; // (R$)
 	char nome[50];
-	char id[50];
+	char id[50]; // 123-ABC
+	struct _PRODUTO_ *prox; // ponteiro para o próximo elemento
 };
-typedef struct _PRODUTO_ T_PRODUTO;
+
+typedef struct _PRODUTO_ *T_PRODUTO;
 
 /*
 =------------------=
 =-> Subprogramas <-=
 =------------------=
 */
-// < Função para criação/abertura do arquivo >
-FILE *criarArquivo(char filename[])
+// < Função para inicializar a lista simplesmente encadeada dos produtos >
+T_PRODUTO criarProduto(int quantidade, float valor, char nome[], char id[])
 {
 	// < Declaração de variáveis locais >
-	FILE *arq;
-	
-	// < Abre (ou cria) o arquivo >	
-	arq = fopen(filename, "ab");
-	
-	// < Retorna o arquivo aberto >
-	return arq;
+	T_PRODUTO p;
+
+	// < Aloca espaço na memória para o novo produto >
+	p = (T_PRODUTO)malloc(sizeof(T_PRODUTO));
+
+	// < Cria o novo produto >
+	p->quantidade = quantidade;
+	p->valor = valor;
+	strcpy(p->nome, nome);
+	strcpy(p->id, id);
+	p->prox = NULL;
+
+	// < Retorna o produto criado >
+	return p;
+}
+
+//< Função para adicionar novos produtos à lista >
+T_PRODUTO adicionarProduto(int quantidade, float valor, char nome[], char id[], T_PRODUTO proximo)
+{
+	// < Declaração de variáveis locais >
+	T_PRODUTO p;
+
+	// < Alocação de memória >
+	p = (T_PRODUTO)malloc(sizeof(T_PRODUTO));
+
+	// < Cria o novo produto >
+	p->quantidade = quantidade;
+	p->valor = valor;
+	strcpy(p->nome, nome);
+	strcpy(p->id, id);
+	p->prox = proximo;
+
+	// < Retorna o produto criado >
+	return p;
 }
 
 // < Função para gerar sigla de produtos >
 char *addSigla(char *sigla)
 {
 	// < Declaração de variáveis locais >
-	char novo_nome[50] = "-";
-	
+	char nova_sigla[50] = "-";
+
 	// < Coleta as três letras iniciais >
-	strncat(novo_nome, sigla, 3);
+	strncat(nova_sigla, sigla, 3);
 	
-	strcpy(sigla, novo_nome);
+	// < Envia a nova sigla para a sigla original >
+	strcpy(sigla, nova_sigla);
 	
 	// < Retorna o id gerado >
 	return sigla;
 }
 
 // < Procedimento para inserção de produtos na lista >
-void inserirProdutos()
+void inserirProdutos(T_PRODUTO p)
 {
 	// < Declaração de variáveis locais >
-	int cancelar;
-	char sigla[4];
-	T_PRODUTO produto;
-	
-	// < Cria ou inicia o arquivo >
-	FILE *arq = criarArquivo("produtos.dat");
+	int cancelar, quantidade;
+	float valor;
+	char sigla[4], nome[50], id[50];
 	
 	// < Entrada de dados >
 	do
@@ -87,37 +115,41 @@ void inserirProdutos()
 		printf("\n>--------<[ Informações do produto ]>--------<\n");
 		
 		printf("Nome: ");
-		scanf("%s", produto.nome);
+		scanf("%s", nome);
 		
 		printf("Valor: R$");
-		scanf("%f", &produto.valor);
+		scanf("%f", &valor);
 		
 		printf("Quantidade (pode mudar depois!): ");
-		scanf("%i", &produto.quantidade);
+		scanf("%i", &quantidade);
 		
 		printf("ID numérico: ");
-		scanf("%s", produto.id);
+		scanf("%s", id);
 		
-		strcpy(sigla, produto.nome);
+		strcpy(sigla, nome);
 		
 		// < Gera a sigla do produto >
 		addSigla(sigla);
 		
 		// < Concatena o ID numérico com a sigla >
-		strcat(produto.id, sigla);
+		strcat(id, sigla);
+
+		// < Verifica se a lista está vazia, se estiver cria uma nova >
+		if (p == NULL)
+		{
+			p = criarProduto(quantidade, valor, nome, id);
+		}
+		else
+		{
+			p = adicionarProduto(quantidade, valor, nome, id, p);
+		}
 		
-		printf("[!] Sucesso! O produto \"%s\" foi criado com ID %s\n", produto.nome, produto.id);
-		
-		// < Escreve no arquivo >
-		fwrite(&produto, sizeof(T_PRODUTO), 1, arq);
+		printf("[!] Sucesso! O produto \"%s\" foi criado com ID %s\n", nome, id);
 		
 		printf("[!] Adicionar mais produtos? Digite 1 para NÃO ou 0 par SIM: ");
 		scanf("%i", &cancelar);
 		
 	} while (cancelar != 1);
-	
-	// < Fecha o arquivo >
-	fclose(arq);
 }
 
 // < Procedimento para mostrar os produtos registrados >
@@ -125,16 +157,8 @@ void mostrarProdutos()
 {
 	// < Declaração de variáveis locais>
 	char linha[20];
-	int buffer[10];
-	
-	FILE *arq = fopen("produtos.dat", "rb");
 	
 	printf("\n>-----------------<[ P R O D U T O S ]>-----------------<\n");
-	
-	while(fgets(linha, 20, arq) != NULL)
-	{
-		fread(buffer,sizeof(T_PRODUTO),10,arq);
-	}
 	system("pause");
 }
 
@@ -143,6 +167,9 @@ void menu()
 {
 	// < Declaração de variáveis locais >
 	int opcao;
+	T_PRODUTO p;
+
+	p = NULL;
 	
 	// < Entrada de dados >
 	do
@@ -153,7 +180,7 @@ void menu()
 		switch(opcao)
 		{
 			case 1:
-				inserirProdutos();
+				inserirProdutos(p);
 			break;
 			
 			case 2:
@@ -185,3 +212,4 @@ int main (void)
 	// < Inicia o menu principal >
 	menu();
 }
+
