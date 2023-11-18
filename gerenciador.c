@@ -32,8 +32,8 @@ struct _PRODUTO_
 {
 	int quantidade;
 	float valor;
-	unsigned char nome[50];
-	unsigned char id[50];
+	char nome[50];
+	char id[50];
 };
 typedef struct _PRODUTO_ T_PRODUTO;
 
@@ -56,10 +56,10 @@ FILE *criarArquivo(char filename[])
 }
 
 // < Função para gerar sigla de produtos >
-unsigned char *addSigla(unsigned char *sigla)
+char *addSigla(char *sigla)
 {
 	// < Declaração de variáveis locais >
-	unsigned char novo_nome[50] = "-";
+	char novo_nome[50] = "-";
 	
 	// < Coleta as três letras iniciais >
 	strncat(novo_nome, sigla, 3);
@@ -74,16 +74,14 @@ unsigned char *addSigla(unsigned char *sigla)
 void inserirProdutos()
 {
 	// < Declaração de variáveis locais >
-	int cancelar, produtos;
-	unsigned char sigla[4];
+	int cancelar;
+	char sigla[4];
 	T_PRODUTO produto;
 	
 	// < Cria ou inicia o arquivo >
 	FILE *arq = criarArquivo("produtos.dat");
 	
 	// < Entrada de dados >
-	produtos = 0;
-	
 	do
 	{
 		printf("\n>--------<[ Informações do produto ]>--------<\n");
@@ -126,7 +124,8 @@ void inserirProdutos()
 void mostrarProdutos()
 {
 	// < Declaração de variáveis locais>
-	unsigned char linha[20];
+	char linha[20];
+	int buffer[10];
 	
 	FILE *arq = fopen("produtos.dat", "rb");
 	
@@ -134,7 +133,7 @@ void mostrarProdutos()
 	
 	while(fgets(linha, 20, arq) != NULL)
 	{
-		printf("%s", linha);
+		fread(buffer,sizeof(T_PRODUTO),10,arq);
 	}
 	system("pause");
 }
