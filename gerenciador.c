@@ -101,6 +101,84 @@ char *addSigla(char *sigla)
 	return sigla;
 }
 
+// < Procedimento para mostrar os produtos registrados >
+void mostrarProdutos(T_PRODUTO p)
+{
+	// < Declaração de variáveis locais >
+	int i = 0;
+
+	if (p == NULL)
+	{
+		printf("| ! | Lista vazia.\n");
+	}
+	else
+	{
+		printf("<---------------------<[ P R O D U T O S ]--------------------->\n");
+
+		while (p != NULL)
+		{
+			i++;
+			// < Imprime o produto >
+			printf("<-<| %i |>->\tID: %s\tNome: %s\tValor: R$ %.2f\tQtd.: %i\n\n", i, p->id, p->nome, p->valor, p->quantidade);
+			
+			// < Anda na lista >
+			p = p->prox;
+		}
+	}
+}
+
+// < Procedimento para deixar os produtos em ordem alfabética >
+void ordemAlfabetica(T_PRODUTO p)
+{
+    // < Declaração de variáveis locais >
+    T_PRODUTO aux, prox;
+    int qtd_aux;
+    float valor_aux;
+    char nome_aux[50], id_aux[50];
+    int trocou;
+
+    do {
+        trocou = 0; // deixa a flag falsa para caso não haja trocas o loop parar
+
+        aux = p;
+
+        // < Percorre a lista >
+        while (aux->prox != NULL)
+        {
+            prox = aux->prox;
+
+            if (strcmp(aux->nome, prox->nome) > 0)
+            {
+                // < Troca os nomes dos produtos >
+                strcpy(nome_aux, aux->nome);
+                strcpy(aux->nome, prox->nome);
+                strcpy(prox->nome, nome_aux);
+
+                // < Troca os IDs dos produtos >
+                strcpy(id_aux, aux->id);
+                strcpy(aux->id, prox->id);
+                strcpy(prox->id, id_aux);
+
+                // < Troca os preços dos produtos >
+                valor_aux = aux->valor;
+                aux->valor = prox->valor;
+                prox->valor = valor_aux;
+
+                // < Troca a quantidade de unidades do produto >
+                qtd_aux = aux->quantidade;
+                aux->quantidade = prox->quantidade;
+                prox->quantidade = qtd_aux;
+
+                trocou = 1; // Faz a troca e deixa a flag verdadeira para não parar o loop
+            }
+
+            // < Anda na lista >
+            aux = aux->prox;
+        }
+
+    } while (trocou);
+}
+
 // < Procedimento para inserção de produtos na lista >
 T_PRODUTO inserirProdutos(T_PRODUTO p)
 {
@@ -144,6 +222,8 @@ T_PRODUTO inserirProdutos(T_PRODUTO p)
 			p = adicionarProduto(quantidade, valor, nome, id, p);
 		}
 		
+		ordemAlfabetica(p);
+
 		printf("[!] Sucesso! O produto \"%s\" foi criado com ID %s\n", nome, id);
 		
 		printf("[!] Adicionar mais produtos? Digite 1 para NÃO ou 0 par SIM: ");
@@ -154,41 +234,13 @@ T_PRODUTO inserirProdutos(T_PRODUTO p)
 	return p;
 }
 
-// < Procedimento para mostrar os produtos registrados >
-void mostrarProdutos(T_PRODUTO p)
-{
-	// < Declaração de variáveis locais >
-	int i = 0;
-
-	if (p == NULL)
-	{
-		printf("| ! | Lista vazia.\n");
-	}
-	else
-	{
-		printf("<---------------------<[ P R O D U T O S ]--------------------->\n");
-
-		while (p != NULL)
-		{
-			i++;
-			// < Imprime o produto >
-			printf("<-<| %i |>->\tID: %s\tNome: %s\tValor: R$ %.2f\tQtd.: %i\n\n", i, p->id, p->nome, p->valor, p->quantidade);
-			
-			// < Anda na lista >
-			p = p->prox;
-		}
-	}
-}
-
 // < Procedimento para o menu principal do programa >
 void menu()
 {
 	// < Declaração de variáveis locais >
 	int opcao;
-	T_PRODUTO p;
+	T_PRODUTO p = NULL;
 
-	p = NULL;
-	
 	// < Entrada de dados >
 	do
 	{
@@ -225,7 +277,7 @@ void menu()
 int main (void)
 {
 	// < Aceita os acentos no terminal >
-	setlocale(LC_ALL, "Portuguese");
+	setlocale(LC_ALL, "");
 	
 	// < Inicia o menu principal >
 	menu();
