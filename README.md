@@ -5,7 +5,7 @@ Programa na linguagem C que simula o gerenciamento de estoque de um armazém, pa
 Todos os recursos que deverão ser implantados no projeto:
 |Ordem|Recurso|Status|
 |------|-------|-------|
-|0|Sistema de gerenciamento de estoque de um armazém, onde a lista de produtos é ordenada pelo nome do produto|❌|
+|0|Sistema de gerenciamento de estoque de um armazém, onde a lista de produtos é ordenada pelo nome do produto|✅|
 |1|Busca de um produto pelo nome no estoque e cálculo de complexidade do tempo no pior caso|❌|
 |2|Algoritmo de ordenação para manter o estoque sempre ordenado (por nome, id ou valor) |❌|
 |3|Busca binária que aproveita a ordenação alfabética da lista de produtos|❌|
