@@ -137,7 +137,8 @@ void ordemAlfabetica(T_PRODUTO p)
     char nome_aux[50], id_aux[50];
     int trocou;
 
-    do {
+    do 
+	{
         trocou = 0; // deixa a flag falsa para caso não haja trocas o loop parar
 
         aux = p;
@@ -149,10 +150,9 @@ void ordemAlfabetica(T_PRODUTO p)
 
             if (strcmp(aux->nome, prox->nome) > 0)
             {
-                // < Troca os nomes dos produtos >
-                strcpy(nome_aux, aux->nome);
-                strcpy(aux->nome, prox->nome);
-                strcpy(prox->nome, nome_aux);
+                strcpy(nome_aux, prox->nome);
+                strcpy(prox->nome, aux->nome);
+                strcpy(aux->nome, nome_aux);
 
                 // < Troca os IDs dos produtos >
                 strcpy(id_aux, aux->id);
@@ -180,12 +180,12 @@ void ordemAlfabetica(T_PRODUTO p)
 }
 
 // < Procedimento para inserção de produtos na lista >
-T_PRODUTO inserirProdutos(T_PRODUTO p)
+T_PRODUTO inserirProdutos(T_PRODUTO p, int *qtd_produtos)
 {
 	// < Declaração de variáveis locais >
 	int cancelar, quantidade;
 	float valor;
-	char sigla[4], nome[50], id[50];
+	char sigla[4], nome[50], qtd_produtos_str[64];
 	
 	// < Entrada de dados >
 	do
@@ -198,33 +198,46 @@ T_PRODUTO inserirProdutos(T_PRODUTO p)
 		printf("Valor: R$");
 		scanf("%f", &valor);
 		
-		printf("Quantidade (pode mudar depois!): ");
+		printf("Quantidade: ");
 		scanf("%i", &quantidade);
 		
-		printf("ID numérico: ");
-		scanf("%s", id);
+		(*qtd_produtos)++;
 		
 		strcpy(sigla, nome);
 		
 		// < Gera a sigla do produto >
 		addSigla(sigla);
-		
+
+		// < Converte int para string >
+		if (*qtd_produtos < 10)
+		{
+			sprintf(qtd_produtos_str, "00%i", *qtd_produtos);
+		}
+		else if (*qtd_produtos < 100)
+		{
+			sprintf(qtd_produtos_str, "0%i", *qtd_produtos);
+		}
+		else
+		{
+			sprintf(qtd_produtos_str, "%i", *qtd_produtos);
+		}
+
 		// < Concatena o ID numérico com a sigla >
-		strcat(id, sigla);
+		strcat(qtd_produtos_str, sigla);
 
 		// < Verifica se a lista está vazia, se estiver cria uma nova >
 		if (p == NULL)
 		{
-			p = criarProduto(quantidade, valor, nome, id);
+			p = criarProduto(quantidade, valor, nome, qtd_produtos_str);
 		}
 		else
 		{
-			p = adicionarProduto(quantidade, valor, nome, id, p);
+			p = adicionarProduto(quantidade, valor, nome, qtd_produtos_str, p);
 		}
 		
 		ordemAlfabetica(p);
 
-		printf("[!] Sucesso! O produto \"%s\" foi criado com ID %s\n", nome, id);
+		printf("[!] Sucesso! O produto \"%s\" foi criado com ID %s\n", nome, qtd_produtos_str);
 		
 		printf("[!] Adicionar mais produtos? Digite 1 para NÃO ou 0 par SIM: ");
 		scanf("%i", &cancelar);
@@ -238,7 +251,7 @@ T_PRODUTO inserirProdutos(T_PRODUTO p)
 void menu()
 {
 	// < Declaração de variáveis locais >
-	int opcao;
+	int opcao, qtd_produtos = 0;
 	T_PRODUTO p = NULL;
 
 	// < Entrada de dados >
@@ -250,7 +263,7 @@ void menu()
 		switch(opcao)
 		{
 			case 1:
-				p = inserirProdutos(p);
+				p = inserirProdutos(p, &qtd_produtos);
 			break;
 			
 			case 2:
